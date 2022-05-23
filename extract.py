@@ -8,7 +8,7 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 def cut_video(filename, start_time, end_time, target_name):
     ffmpeg_extract_subclip(filename, start_time, end_time, targetname=target_name)
 
-SAVING_FRAMES_PER_SECOND = 3
+SAVING_FRAMES_PER_SECOND = 2
 
 def format_timedelta(td):
     """Utility function to format timedelta objects in a cool way (e.g 00:00:20.05)
@@ -44,7 +44,7 @@ def extract_frames(video_file):
         video_clip.save_frame(frame_filename, current_duration)
 
 def main():
-    time_codes = [(0, 5)]
+    time_codes = [(0, 12)]
     cut_videos_folder = "./results/"
     for index, filename in enumerate(os.listdir("./videos")):
         cut_video("./videos/" + filename, time_codes[index][0], time_codes[index][1], cut_videos_folder + filename)
