@@ -103,6 +103,7 @@ def extract_frames(video_file, s_f_p_s):
         video_clip.save_frame(frame_filename, current_duration)
 
 def processImage(frames, exercise, requested_landmarks, exercise_path):
+    BG_COLOR = (192, 192, 192)
     try:
         mp_pose = mp.solutions.pose
         mp_drawing = mp.solutions.drawing_utils
@@ -125,22 +126,30 @@ def processImage(frames, exercise, requested_landmarks, exercise_path):
                 exercise_folder = os.path.join(exercise_path, "frames", frame)
                 image = cv2.imread(exercise_folder)
                 result = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+                annotated_image = image.copy()
+                condition = np.stack((result.segmentation_mask,) * 3, axis=-1) > 0.1
+                bg_image = np.zeros(image.shape, dtype=np.uint8)
+                bg_image[:] = BG_COLOR
+                annotated_image = np.where(condition, annotated_image, bg_image)
                 mp_drawing.draw_landmarks(
-                    image,
+                    annotated_image,
                     result.pose_landmarks,
                     mp_pose.POSE_CONNECTIONS,
                     landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
 
-                cv2.imwrite(os.path.join(landmarks_folder, f"{str(i)}.jpg"), image)
+                cv2.imwrite(os.path.join(landmarks_folder, f"{str(i)}.jpg"), annotated_image)
 
                 landmarks = result.pose_landmarks.landmark
                 selected_landmarks = []
                 for landmark_index in requested_landmarks:
                     selected_landmarks.append({
                         "type": getLandmarkType(landmark_index),
-                        "x": landmarks[landmark_index].x,
-                        "y": landmarks[landmark_index].y,
-                        "visibility": landmarks[landmark_index].visibility,
+                        "position" : {
+                            "x": landmarks[landmark_index].x,
+                            "y": landmarks[landmark_index].y,
+                        },
+                        "inFrameLikelihood": landmarks[landmark_index].visibility,
                     })
 
                 dict_result["phases"].append({"phase_id": i, "landmarks": selected_landmarks})
@@ -192,7 +201,7 @@ def process_frames():
 
 
 if __name__ == "__main__":
-    extract()
+    # extract()
     process_frames()
 
 
