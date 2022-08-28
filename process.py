@@ -61,6 +61,10 @@ def getLandmarkType(landmarkType):
         return "LEFT_HEEL"
     elif landmarkType == PoseLandmark.RIGHT_HEEL:
         return "RIGHT_HEEL"
+    elif landmarkType == PoseLandmark.LEFT_ANKLE:
+        return "LEFT_ANKLE"
+    elif landmarkType == PoseLandmark.RIGHT_ANKLE:
+        return "RIGHT_ANKLE"
     elif landmarkType == PoseLandmark.LEFT_FOOT_INDEX:
         return "LEFT_FOOT_INDEX"
     elif landmarkType == PoseLandmark.RIGHT_FOOT_INDEX:
@@ -183,25 +187,24 @@ def extract():
 
         extract_frames(cut_video_destination_folder, saving_frames_per_second)
 
-def process_frames():
+def process_frames(exerciseNmae):
     destination_folder = "../research_app_native/src/checkpoints/"
-    for folder in os.listdir(destination_folder):
-        temp_file_name = ""
-        folder = os.path.join(destination_folder, folder)
-        if os.path.isfile(folder):
-            temp_file_name = folder
-        if os.path.isdir(folder):
-            frames_folder = os.path.join(folder, 'frames')
-            landmarks_folder = os.path.join(folder, 'landmarks')
-            selected_landmarks = [int(i) for i in input("Please, select the desired landmarks for the analysis:").split()]
-            os.makedirs(landmarks_folder)
-            processImage(sorted(os.listdir(frames_folder), key=extract_integer_to_sort), temp_file_name,
-                         selected_landmarks, folder)
+    temp_file_name = ""
+    folder = os.path.join(destination_folder, exerciseNmae)
+    if os.path.isfile(folder):
+        temp_file_name = folder
+    if os.path.isdir(folder):
+        frames_folder = os.path.join(folder, 'frames')
+        landmarks_folder = os.path.join(folder, 'landmarks')
+        selected_landmarks = [int(i) for i in input("Please, select the desired landmarks for the analysis:").split()]
+        os.makedirs(landmarks_folder)
+        processImage(sorted(os.listdir(frames_folder), key=extract_integer_to_sort), temp_file_name,
+                     selected_landmarks, folder)
             # shutil.rmtree(frames_folder)
 
 
 if __name__ == "__main__":
-    # extract()
-    process_frames()
+    extract()
+    # process_frames("Quarter_squat")
 
 
